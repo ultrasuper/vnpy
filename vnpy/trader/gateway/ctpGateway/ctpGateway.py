@@ -102,8 +102,7 @@ class CtpGateway(VtGateway):
         self.qryEnabled = False         # 循环查询
         
         self.fileName = self.gatewayName + '_connect.json'
-        self.filePath = 
-        (self.fileName, __file__)        
+        self.filePath = getJsonPath(self.fileName, __file__)        
         
     #----------------------------------------------------------------------
     def connect(self):
