@@ -109,6 +109,13 @@ class VtGateway(object):
         self.eventEngine.put(event1)        
     
     #----------------------------------------------------------------------
+    def onAllContracts(self, activeContracts):
+        """市场上全部合约信息推送"""
+        # 自定义事件
+        event1 = Event(type_=EVENT_ALLCONTRACTS)
+        event1.dict_['data'] = activeContracts
+        self.eventEngine.put(event1)
+    #----------------------------------------------------------------------
     def connect(self):
         """连接"""
         pass

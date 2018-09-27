@@ -66,7 +66,8 @@ class DrEngine(object):
         self.lastTimerTime = None               # 上一次记录时间
         
         # 载入设置，订阅行情
-        self.loadSetting()
+        ### 这里做了修改，要先获取、更新市场上全部的合约代码，再加载设置，后面回创建新函数调用
+        # self.loadSetting() 
         
         # 启动数据插入线程
         self.start()
@@ -227,6 +228,20 @@ class DrEngine(object):
         self.lastTimerTime = currentTime
     
     #----------------------------------------------------------------------
+    def processAllContractsEvent(self, event):
+        """处理推送全部合约代码事件"""
+        contract_data = event.dict_['data']
+        nl = []
+        for ocn in contract_data:
+            nl.append([ocn, "CTP"])
+        json_data = {'working':True, 'tick':nl, 'bar':nl, 'active':{}}
+        d1 = json.dumps(json_data, sort_keys=True, indent=4)
+        f = open(os.path.join(os.getcwd(), self.settingFileName), 'w')
+        f.write(d1)
+        f.close()
+        self.loadSetting()
+
+    #----------------------------------------------------------------------
     def onTick(self, tick):
         """Tick更新"""
         vtSymbol = tick.vtSymbol
@@ -268,6 +283,7 @@ class DrEngine(object):
         """注册事件监听"""
         self.eventEngine.register(EVENT_TICK, self.procecssTickEvent)
         self.eventEngine.register(EVENT_TIMER, self.processTimerEvent)
+        self.eventEngine.register(EVENT_ALLCONTRACTS, self.processAllContractsEvent)
  
     #----------------------------------------------------------------------
     def insertData(self, dbName, collectionName, data):

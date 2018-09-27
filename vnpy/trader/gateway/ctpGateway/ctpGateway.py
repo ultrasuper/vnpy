@@ -102,7 +102,8 @@ class CtpGateway(VtGateway):
         self.qryEnabled = False         # 循环查询
         
         self.fileName = self.gatewayName + '_connect.json'
-        self.filePath = getJsonPath(self.fileName, __file__)        
+        self.filePath = getJsonPath(self.fileName, __file__)  
+        self.activeContracts = []      
         
     #----------------------------------------------------------------------
     def connect(self):
@@ -854,11 +855,13 @@ class CtpTdApi(TdApi):
 
         # 推送
         self.gateway.onContract(contract)
+        self.activeContracts.append(data['InstrumentID'])
         
         # 缓存合约代码和交易所映射
         symbolExchangeDict[contract.symbol] = contract.exchange
 
         if last:
+            self.onAllContracts(self.activeContracts)
             self.writeLog(text.CONTRACT_DATA_RECEIVED)
         
     #----------------------------------------------------------------------
